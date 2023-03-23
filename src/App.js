@@ -6,6 +6,8 @@ import axios from "./axios";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import Offerimg from "../src/assets/OfferBase.png";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 function App() {
   const [offers, setOffers] = useState([]);
 
@@ -68,6 +70,15 @@ function App() {
 
     try {
       await axios.post("/offers", offer);
+      toast.success("Offer Created", {
+        position: "top-center",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
     } catch (err) {
       console.log(err);
     }
@@ -142,7 +153,7 @@ function App() {
         ctx.fillText(
           offer.offerDescription,
           offerDescriptionX,
-          boxY + boxHeight  + 50
+          boxY + boxHeight + 50
         );
 
         const date = new Date(offer.expirationDate);
@@ -164,18 +175,14 @@ function App() {
         const expirationTextWidth = ctx.measureText(expirationText).width;
         const expirationTextX =
           boxX + boxWidth / 2 - expirationTextWidth / 2 + 60;
-        ctx.fillText(
-          expirationText,
-          expirationTextX,
-          boxY + boxHeight  + 70
-        );
+        ctx.fillText(expirationText, expirationTextX, boxY + boxHeight + 70);
 
         ctx.font = " 12px Arial";
         ctx.fillStyle = "#FF7B5F";
         ctx.textAlign = "center";
         ctx.fillText(
           "Anjana Beauty Salon",
-          canvas.width / 2 +50,
+          canvas.width / 2 + 50,
           canvas.height - 20
         );
 
@@ -184,8 +191,8 @@ function App() {
         ctx.textAlign = "center";
         ctx.fillText(
           "23, Sector 3, Rajiv Nagar, Raigad",
-          canvas.width / 2 +50,
-          canvas.height - 10 +5
+          canvas.width / 2 + 50,
+          canvas.height - 10 + 5
         );
       };
 
@@ -257,19 +264,18 @@ function App() {
               <option value='gift'>Free Gift</option>
             </select>
 
-            <div>
-              {showDiscountInput && (
-                <>
-                  <label className='input-group__label'>Discount % *</label>
-                  <input
-                    type='text'
-                    style={{ marginRight: "10px" }}
-                    required
-                    ref={OfferDiscountperRef}
-                  />
-                </>
-              )}
-            </div>
+            {showDiscountInput && (
+              <>
+                <label className='input-group__label'>Discount % *</label>
+                <input
+                  type='text'
+                  style={{ marginRight: "10px" }}
+                  required
+                  ref={OfferDiscountperRef}
+                  className='input-group__item'
+                />
+              </>
+            )}
           </div>
         </div>
 
@@ -361,6 +367,17 @@ function App() {
         <div className='btn'>
           <button type='submit' onClick={handleClick}>
             Create Offer
+            <ToastContainer
+              position='top-center'
+              autoClose={1000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+            />
           </button>
         </div>
       </form>
