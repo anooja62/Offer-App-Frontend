@@ -2,7 +2,7 @@ import axios from 'axios'
 
 
 const instance = axios.create({
-    baseURL : 'https://offer-create-app-api.onrender.com',
+    baseURL : 'https://offer-create-app-api.onrender.com/',
 })
 
 
