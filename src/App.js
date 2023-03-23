@@ -86,20 +86,20 @@ function App() {
       if (!canvasRef.current) {
         return;
       }
-      
+
       const canvas = canvasRef.current;
       const ctx = canvas.getContext("2d");
       const img = new Image();
-      
+
       img.onload = function () {
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    
+
+        const margin = 10;
         const boxWidth = canvas.width / 2;
-        const boxHeight = 40;
-        const boxX = (canvas.width / 2) - (boxWidth / 2) - 20;
-        const boxY = canvas.height / 2 - boxHeight / 2 - 10;
-    
-       
+        const boxHeight = 30;
+        const boxX = canvas.width - boxWidth - margin;
+        const boxY = margin;
+
         ctx.shadowOffsetX = 2;
         ctx.shadowOffsetY = 2;
         ctx.shadowBlur = 5;
@@ -107,17 +107,47 @@ function App() {
         ctx.fillStyle = "#FF7B5F";
         ctx.roundRect(boxX, boxY, boxWidth, boxHeight, 20);
         ctx.fill();
-    
-        
+
         ctx.font = "bold 20px Arial";
         ctx.fillStyle = "#fff";
         ctx.textAlign = "center";
-        ctx.fillText(offer.offerCode, canvas.width / 2, canvas.height / 2);
+
+        ctx.fillText(
+          offer.offerCode,
+          boxX + boxWidth / 2,
+          boxY + boxHeight / 2 + 5
+        );
+
+        const discountText = `GET ${offer.discountPercentage}% OFF`;
+
+        ctx.font = "bold 18px Arial";
+        ctx.fillStyle = "#000";
+        ctx.textAlign = "center";
+        const discountTextWidth = ctx.measureText(discountText).width;
+        ctx.fillText(
+          discountText,
+          boxX + boxWidth / 2,
+          boxY + boxHeight + margin + 20
+        );
+
+        ctx.font = "bold 18px Arial";
+        ctx.fillStyle = "#000";
+        ctx.textAlign = "center";
+        const offerDescriptionWidth = ctx.measureText(
+          offer.offerDescription
+        ).width;
+        const offerDescriptionX =
+          boxX + boxWidth / 2 - offerDescriptionWidth / 2 + 50;
+
+        ctx.fillText(
+          offer.offerDescription,
+          offerDescriptionX,
+          boxY + boxHeight + margin + 50
+        );
       };
-      
+
       img.src = Offerimg;
     }, []);
-    
 
     return (
       <canvas
