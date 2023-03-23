@@ -1,18 +1,22 @@
 /** @format */
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import "./App.css";
 import axios from "./axios";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
+import Offerimg from "../src/assets/OfferBase.png";
 function App() {
+  const [offers, setOffers] = useState([]);
+
+  const canvasRef = useRef(null);
   const [numberOfCustomers, setNumberOfCustomers] = useState("unlimited");
   const [usagePerCustomer, setUsagePerCustomer] = useState("unlimited");
-
+  const [discountType, setDiscountType] = useState("null");
+  const [showDiscountInput, setShowDiscountInput] = useState(true);
   const OfferCodeRef = useRef();
   const OfferTitleRef = useRef();
   const OfferDescriptionRef = useRef();
-  const OfferTypeRef = useRef();
   const OfferDiscountperRef = useRef();
   const OfferApplicableRef = useRef();
   const MinOrderValueRef = useRef();
@@ -33,13 +37,23 @@ function App() {
 
     setUsagePerCustomer(buttonValue);
   };
+  const handleDiscountTypeChange = (e) => {
+    const type = e.target.value;
+    setDiscountType(type);
+
+    if (type !== "percentage") {
+      setShowDiscountInput(false);
+    } else {
+      setShowDiscountInput(true);
+    }
+  };
   const handleClick = async (e) => {
     e.preventDefault();
     const offer = {
       offerCode: OfferCodeRef.current.value,
       offerTitle: OfferTitleRef.current.value,
       offerDescription: OfferDescriptionRef.current.value,
-      offerType: OfferTypeRef.current.value,
+      offerType: discountType,
       discountPercentage: OfferDiscountperRef.current.value,
       applicableOn: OfferApplicableRef.current.value,
       minOrderValue: MinOrderValueRef.current.value,
@@ -48,7 +62,7 @@ function App() {
       expirationDate: ExpirationDateRef.current.value,
       numberOfCustomers: numberOfCustomers,
       totalCustomers: TotalCustomersRef.current.value,
-      usePerCustomers:usagePerCustomer,
+      usePerCustomers: usagePerCustomer,
       usagePerCustomers: UsagePerCustomerRef.current.value,
     };
 
@@ -58,6 +72,62 @@ function App() {
       console.log(err);
     }
   };
+  const getAllOffers = async () => {
+    try {
+      const response = await axios.get("/all-offers");
+      setOffers(response.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  function OfferCanvas({ offer }) {
+    const canvasRef = useRef(null);
+    useEffect(() => {
+      if (!canvasRef.current) {
+        return;
+      }
+      
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext("2d");
+      const img = new Image();
+      
+      img.onload = function () {
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    
+        const boxWidth = canvas.width / 2;
+        const boxHeight = 40;
+        const boxX = (canvas.width / 2) - (boxWidth / 2) - 20;
+        const boxY = canvas.height / 2 - boxHeight / 2 - 10;
+    
+       
+        ctx.shadowOffsetX = 2;
+        ctx.shadowOffsetY = 2;
+        ctx.shadowBlur = 5;
+        ctx.shadowColor = "rgba(0, 0, 0, 0.3)";
+        ctx.fillStyle = "#FF7B5F";
+        ctx.roundRect(boxX, boxY, boxWidth, boxHeight, 20);
+        ctx.fill();
+    
+        
+        ctx.font = "bold 20px Arial";
+        ctx.fillStyle = "#fff";
+        ctx.textAlign = "center";
+        ctx.fillText(offer.offerCode, canvas.width / 2, canvas.height / 2);
+      };
+      
+      img.src = Offerimg;
+    }, []);
+    
+
+    return (
+      <canvas
+        ref={canvasRef}
+        id={`offerCanvas${offer._id}`}
+        className='offer-canvas'
+      />
+    );
+  }
+
   return (
     <div className='App'>
       <h1>Create Offer</h1>
@@ -84,42 +154,51 @@ function App() {
         </div>
 
         <div className='form__input'>
-        <div className='input-group'>
-        <label className='input-group__label'>Offer Description *</label>
-          <input
-            type='text'
-            maxLength={140}
-            style={{ marginRight: "10px" }}
-            ref={OfferDescriptionRef}
-          ></input>
-          
-           <label className='input-group__label'>Applicable on*</label>
-          <select ref={OfferApplicableRef}>
-            <option> All Orders</option>
-            <option> Orders above certain amount</option>
-            <option> Select services</option>
-          </select>
+          <div className='input-group'>
+            <label className='input-group__label'>Offer Description *</label>
+            <input
+              type='text'
+              maxLength={140}
+              style={{ marginRight: "10px" }}
+              ref={OfferDescriptionRef}
+            />
+            <label className='input-group__label'>Applicable on*</label>
+            <select ref={OfferApplicableRef}>
+              <option> All Orders</option>
+              <option> Orders above certain amount</option>
+              <option> Select services</option>
+            </select>
+          </div>
         </div>
-        </div>
+
         <div className='form__input'>
           <div className='input-group'>
             <label className='input-group__label'>Offer Type*</label>
-            <select ref={OfferTypeRef} required>
-              <option> Percentage discount</option>
-              <option> Flat discount</option>
-              <option> Free Gift</option>
+            <select
+              value={discountType}
+              required
+              onChange={handleDiscountTypeChange}
+            >
+              <option value='percentage'>Percentage discount</option>
+              <option value='flat'>Flat discount</option>
+              <option value='gift'>Free Gift</option>
             </select>
 
-            <label className='input-group__label'>Discount % *</label>
-            <input
-              type='text'
-              style={{ marginRight: "10px" }}
-              required
-              ref={OfferDiscountperRef}
-            ></input>
+            <div>
+              {showDiscountInput && (
+                <>
+                  <label className='input-group__label'>Discount % *</label>
+                  <input
+                    type='text'
+                    style={{ marginRight: "10px" }}
+                    required
+                    ref={OfferDiscountperRef}
+                  />
+                </>
+              )}
+            </div>
           </div>
         </div>
-       
 
         <div className='form__input'>
           <div className='input-group'>
@@ -130,11 +209,12 @@ function App() {
               required
               min='0'
               ref={MinOrderValueRef}
-            ></input>
+            />
             <label className='input-group__label'>Maximum Discount *</label>
-            <input type='number' required ref={MaxDiscountRef} min='0'></input>
+            <input type='number' required ref={MaxDiscountRef} min='0' />
           </div>
         </div>
+
         <div className='form__input'>
           <div className='input-group'>
             <label className='input-group__label'>Start Date *</label>
@@ -143,11 +223,12 @@ function App() {
               style={{ marginRight: "10px" }}
               required
               ref={StartDateRef}
-            ></input>
+            />
             <label className='input-group__label'>Expiration Date*</label>
-            <input type='date' ref={ExpirationDateRef}></input>
+            <input type='date' ref={ExpirationDateRef} />
           </div>
         </div>
+
         <div className='form__input'>
           <div className='input-group'>
             <label className='input-group__label'>Number of customers </label>
@@ -170,7 +251,7 @@ function App() {
             {numberOfCustomers === "limited" && (
               <>
                 <label className='input-group__label'>Total customers</label>
-                <input type='number'  ref={TotalCustomersRef}></input>
+                <input type='number' ref={TotalCustomersRef}></input>
               </>
             )}
           </div>
@@ -210,6 +291,16 @@ function App() {
           </button>
         </div>
       </form>
+      <button className='btn__show__offers' onClick={getAllOffers}>
+        Show all offers
+      </button>
+      <div className='offers'>
+        {offers.map((offer) => (
+          <div key={offer._id} className='offer'>
+            <OfferCanvas offer={offer} offerImgSrc={Offerimg} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
