@@ -120,7 +120,7 @@ function App() {
 
         const discountText = `GET ${offer.discountPercentage}% OFF`;
 
-        ctx.font = "bold 18px Arial";
+        ctx.font = "bold 15px Arial";
         ctx.fillStyle = "#000";
         ctx.textAlign = "center";
         const discountTextWidth = ctx.measureText(discountText).width;
@@ -130,7 +130,7 @@ function App() {
           boxY + boxHeight + margin + 20
         );
 
-        ctx.font = "bold 18px Arial";
+        ctx.font = "bold 15px Arial";
         ctx.fillStyle = "#000";
         ctx.textAlign = "center";
         const offerDescriptionWidth = ctx.measureText(
@@ -142,7 +142,50 @@ function App() {
         ctx.fillText(
           offer.offerDescription,
           offerDescriptionX,
-          boxY + boxHeight + margin + 50
+          boxY + boxHeight  + 50
+        );
+
+        const date = new Date(offer.expirationDate);
+        const dateString = date.toLocaleDateString("en-US", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        });
+        ctx.font = "12px Arial";
+        ctx.fillStyle = "#FF7B5F";
+        ctx.textAlign = "center";
+        const dateTextWidth = ctx.measureText(dateString).width;
+        const dateTextX =
+          boxX +
+          boxWidth / 2 -
+          (offerDescriptionWidth + dateTextWidth + 10) / 2;
+
+        const expirationText = `Valid till ${dateString}`;
+        const expirationTextWidth = ctx.measureText(expirationText).width;
+        const expirationTextX =
+          boxX + boxWidth / 2 - expirationTextWidth / 2 + 60;
+        ctx.fillText(
+          expirationText,
+          expirationTextX,
+          boxY + boxHeight  + 70
+        );
+
+        ctx.font = " 12px Arial";
+        ctx.fillStyle = "#FF7B5F";
+        ctx.textAlign = "center";
+        ctx.fillText(
+          "Anjana Beauty Salon",
+          canvas.width / 2 +50,
+          canvas.height - 20
+        );
+
+        ctx.font = "12px Arial";
+        ctx.fillStyle = "#FF7B5F";
+        ctx.textAlign = "center";
+        ctx.fillText(
+          "23, Sector 3, Rajiv Nagar, Raigad",
+          canvas.width / 2 +50,
+          canvas.height - 10 +5
         );
       };
 
